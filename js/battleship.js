@@ -172,15 +172,22 @@ var Game = function()
 		}
 		e.target.removeEventListener("click", myself.playerAttack);
 		myself.enemySea.updateWater(attackCoordinate);
-		myself.checkForWin(myself.mySeas, myself.enemySea);
+		var winner = myself.checkForWin(myself.mySeas, myself.enemySea);
+		if(winner)
+		{
+			myself.messageBoard.innerHTML = "You Win!";
+			myself.gameEnd();
+		}
 	}
 
 	this.checkForWin = function(attacker, defender)
 	{
 		if(defender.HP === 0)
 		{
-			this.messageBoard.innerHTML = "You Win!";
+			
+			return true;
 		}
+		return false;
 	}
 	this.gameBegin = function()
 	{
@@ -190,6 +197,19 @@ var Game = function()
 			{
 				enemyWater = this.enemySea.waters[String(i) + String(j)];
 				enemyWater.addEventListener("click", this.playerAttack);
+				enemyWater.self = this; // self is a little confusing
+			}
+		}
+	}
+
+	this.gameEnd = function()
+	{
+		for(var i = 0; i < 10; i++)
+		{
+			for(var j = 0; j < 10; j++)
+			{
+				enemyWater = this.enemySea.waters[String(i) + String(j)];
+				enemyWater.removeEventListener("click", this.playerAttack);
 				enemyWater.self = this; // self is a little confusing
 			}
 		}
