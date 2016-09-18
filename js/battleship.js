@@ -14,6 +14,7 @@ var Board = function(location, owner="mine")
 {
 	this.board = [];
 	this.waters = {};
+	this.HP = 17;
 	this.spreadSeas = function()
 	{
   		var mySeas = document.createElement("table");
@@ -23,10 +24,12 @@ var Board = function(location, owner="mine")
   			var seaLine = document.createElement("tr");
   			for(var j = 0; j < 10; j++)
   			{
+  				var coordinate = String(i) + String(j);
   				myWater = document.createElement("td");
   				myWater.setAttribute("class", owner);
+  				myWater.setAttribute("coordinate", coordinate);
   				this.board[i][j] = 0;
-  				this.waters[String(i) + String(j)] = myWater;
+  				this.waters[coordinate] = myWater;
   				seaLine.appendChild(myWater);
   			}
   			mySeas.appendChild(seaLine);
@@ -88,7 +91,19 @@ var Board = function(location, owner="mine")
 	{
 		if(this.board[coordinate[0]][coordinate[1]] === 1 && this.waters[coordinate].className == "mine")
 		{
-			this.waters[coordinate].style.backgroundColor = "lime";
+			this.waters[coordinate].style.backgroundColor = "lime"; // this will disable the hover pseudoclass for some reason
+		}
+		else if(this.board[coordinate[0]][coordinate[1]] === -1)
+		{
+			this.waters[coordinate].style.backgroundColor = "cyan";
+		}
+		else if(this.board[coordinate[0]][coordinate[1]] === 2)
+		{
+			this.waters[coordinate].style.backgroundColor = "red";
+		}
+		else
+		{
+			this.waters[coordinate].style.backgroundColor = "";
 		}
 		
 	}
@@ -139,6 +154,45 @@ var Game = function()
   		this.mySeas.deployShips();
   		this.enemySea.spreadSeas();
   		this.enemySea.deployShips();
+  		this.gameBegin();
+	}
+	this.playerAttack = function(e)
+	{
+		var attackCoordinate = e.target.getAttribute("coordinate");
+		var myself = e.target.self;
+		var search = myself.enemySea.board[attackCoordinate[0]][attackCoordinate[1]];
+		if(search === 0)
+		{
+			myself.enemySea.board[attackCoordinate[0]][attackCoordinate[1]]--;
+		}
+		else // if search === 1
+		{
+			myself.enemySea.HP--;
+			myself.enemySea.board[attackCoordinate[0]][attackCoordinate[1]]++;
+		}
+		e.target.removeEventListener("click", myself.playerAttack);
+		myself.enemySea.updateWater(attackCoordinate);
+		myself.checkForWin(myself.mySeas, myself.enemySea);
+	}
+
+	this.checkForWin = function(attacker, defender)
+	{
+		if(defender.HP === 0)
+		{
+			this.messageBoard.innerHTML = "You Win!";
+		}
+	}
+	this.gameBegin = function()
+	{
+		for(var i = 0; i < 10; i++)
+		{
+			for(var j = 0; j < 10; j++)
+			{
+				enemyWater = this.enemySea.waters[String(i) + String(j)];
+				enemyWater.addEventListener("click", this.playerAttack);
+				enemyWater.self = this; // self is a little confusing
+			}
+		}
 	}
 }
 
