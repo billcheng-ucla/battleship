@@ -10,33 +10,6 @@ var Player = function(human)
 	this.human = human;
 }
 
-var Game = function()
-{
-	this.myDiv = document.createElement("div");
-	this.enemyDiv = document.createElement("div");
-	this.messageBoard = document.createElement("div");
-	this.arena = document.createElement("div");
-	this.mySeas = new Board(myDiv);
-	this.enemySea = new Board(enemyDiv, "enemy");
-	this.gameSetup = function()
-	{
-		this.arena.appendChild(this.myDiv);
-		this.arena.appendChild(this.messageBoard);
-		messageBoard.innerHTML = "Testing";
-		this.arena.appendChild(this.enemyDiv);
-		var body = $("body");
-		body.append(this.arena);
-		this.newGame();
-	}
-	this.newGame = function()
-	{
-		mySea.spreadSeas();
-  		mySea.deployShips();
-  		enemySea.spreadSeas();
-  		enemySea.deployShips();
-	}
-}
-
 var Board = function(location, owner="mine")
 {
 	this.board = [];
@@ -113,7 +86,7 @@ var Board = function(location, owner="mine")
 
 	this.updateWater = function(coordinate)
 	{
-		if(this.board[coordinate[0]][coordinate[1]] === 1)
+		if(this.board[coordinate[0]][coordinate[1]] === 1 && this.waters[coordinate].className == "mine")
 		{
 			this.waters[coordinate].style.backgroundColor = "lime";
 		}
@@ -142,16 +115,36 @@ var Board = function(location, owner="mine")
 	}
 }
 
+var Game = function()
+{
+	this.myDiv = document.createElement("div");
+	this.enemyDiv = document.createElement("div");
+	this.messageBoard = document.createElement("div");
+	this.arena = document.createElement("div");
+	this.mySeas = new Board(this.myDiv);
+	this.enemySea = new Board(this.enemyDiv, "enemy");
+	this.gameSetup = function()
+	{
+		this.arena.appendChild(this.myDiv);
+		this.arena.appendChild(this.messageBoard);
+		this.messageBoard.innerHTML = "Testing";
+		this.arena.appendChild(this.enemyDiv);
+		var body = $("body");
+		body.append(this.arena);
+		this.newGame();
+	}
+	this.newGame = function()
+	{
+		this.mySeas.spreadSeas();
+  		this.mySeas.deployShips();
+  		this.enemySea.spreadSeas();
+  		this.enemySea.deployShips();
+	}
+}
+
+
+
 $(function() {
-  var myDiv = document.createElement("div");
-  var enemyDiv = document.createElement("div");
-  var body = $("body");
-  var mySea = new Board(myDiv);
-  var enemySea = new Board(enemyDiv, "enemy");
-  body.append(myDiv);
-  body.append(enemyDiv);
-  mySea.spreadSeas();
-  mySea.deployShips();
-  enemySea.spreadSeas();
-  enemySea.deployShips();
+  var game = new Game();
+  game.gameSetup();
 })
