@@ -1,3 +1,5 @@
+var message = "Greetings! Click on a grid to search that tile for an opponent's ship. If the opponent's ship is there, the tile will turn red; the tile will turn light blue if not. After you attack, your opponent will randomly try to attack your ships. Both you and your opponent start with a carrier(size 5), a battleship(size 4), a carrier and destroyer(size 3 each), and a patrol boat (size 2). Your ships have been randomly set for you (Neopet Rules) and they will appear green until hit. The winner is the first to sink his opponent's ships. Good Luck!"
+
 // classes
 var Battleship = function(length, orientation = "horizontal")
 {
@@ -33,6 +35,11 @@ var Board = function(location, owner="mine")
   				seaLine.appendChild(myWater);
   			}
   			mySeas.appendChild(seaLine);
+  		}
+  		//console.log(location.childNodes);
+  		if(location.childNodes[0])
+  		{
+  			location.removeChild(location.childNodes[0]);
   		}
   		location.appendChild(mySeas);
 	}
@@ -135,18 +142,28 @@ var Game = function()
 	this.myDiv = document.createElement("div");
 	this.enemyDiv = document.createElement("div");
 	this.messageBoard = document.createElement("div");
-	this.arena = document.createElement("div");
+	this.restart = document.createElement("button");
 	this.mySeas = new Board(this.myDiv);
 	this.enemySea = new Board(this.enemyDiv, "enemy");
 	this.gameSetup = function()
 	{
-		this.arena.appendChild(this.myDiv);
-		this.arena.appendChild(this.messageBoard);
-		this.messageBoard.innerHTML = "Testing";
-		this.arena.appendChild(this.enemyDiv);
-		var body = $("body");
-		body.append(this.arena);
+		var battlefield = $(".row");
+		console.log(battlefield);
+		battlefield.append(this.myDiv);
+		battlefield.append(this.messageBoard);
+		battlefield.append(this.restart);
+		battlefield.append(this.enemyDiv);
+		this.messageBoard.innerHTML = message;
+		this.restart.innerHTML = "restart";
+		this.restart.addEventListener("click", this.restartGame);
+		this.restart.self = this;
 		this.newGame();
+	}
+
+	this.restartGame = function(e)
+	{
+		var myself = e.target.self;
+		myself.newGame();
 	}
 	this.newGame = function()
 	{
@@ -175,8 +192,42 @@ var Game = function()
 		var winner = myself.checkForWin(myself.mySeas, myself.enemySea);
 		if(winner)
 		{
-			myself.messageBoard.innerHTML = "You Win!";
+			myself.messageBoard.innerHTML = "Player Win!";
 			myself.gameEnd();
+		}
+		else
+		{
+			myself.counterAttack();
+		}
+	}
+
+	this.counterAttack = function()
+	{
+		var attacking = true;
+		while(attacking)
+		{
+			var y = Math.floor(Math.random() * 10);
+			var x = Math.floor(Math.random() * 10);
+			var attackCoordinate = String(y) + String(x);
+			var search = this.mySeas.board[attackCoordinate[0]][attackCoordinate[1]];
+			if(search === 0)
+			{
+				this.mySeas.board[attackCoordinate[0]][attackCoordinate[1]]--;
+				attacking = false;
+			}
+			else if(search === 1)
+			{
+				this.mySeas.HP--;
+				this.mySeas.board[attackCoordinate[0]][attackCoordinate[1]]++;
+				attacking = false;
+			}
+			this.mySeas.updateWater(attackCoordinate);
+		}
+		var enemyWinner = this.checkForWin(this.enemySea, this.mySeas);
+		if(enemyWinner)
+		{
+			this.messageBoard.innerHTML = "AI Wins!";
+			this.gameEnd();
 		}
 	}
 
