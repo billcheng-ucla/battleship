@@ -1,4 +1,4 @@
-var message = "Greetings! Click on a grid to search that tile for an opponent's ship. If the opponent's ship is there, the tile will turn red; the tile will turn light blue if not. After you attack, your opponent will randomly try to attack your ships. Both you and your opponent start with a carrier(size 5), a battleship(size 4), a carrier and destroyer(size 3 each), and a patrol boat (size 2). Your ships have been randomly set for you (Neopet Rules) and they will appear green until hit. The winner is the first to sink his opponent's ships. Good Luck!"
+var message = "Greetings! <br> <br> Click on a grid to search that tile for an opponent's ship. If the opponent's ship is there, the tile will turn red; the tile will turn light blue if not. After you attack, your opponent will randomly try to attack your ships. Both you and your opponent start with a carrier(size 5), a battleship(size 4), a carrier and destroyer(size 3 each), and a patrol boat (size 2). Your ships have been randomly set for you (Neopet Rules) and they will appear green until hit. The winner is the first to sink his opponent's ships. Good Luck! <br><br>"
 
 // classes
 var Battleship = function(length, orientation = "horizontal")
@@ -147,13 +147,18 @@ var Game = function()
 	this.enemySea = new Board(this.enemyDiv, "enemy");
 	this.gameSetup = function()
 	{
+		var neutralZone = document.createElement("div");
+		neutralZone.appendChild(this.messageBoard);
+		neutralZone.appendChild(this.restart);
 		var battlefield = $(".row");
-		console.log(battlefield);
 		battlefield.append(this.myDiv);
-		battlefield.append(this.messageBoard);
-		battlefield.append(this.restart);
+		battlefield.append(neutralZone);
 		battlefield.append(this.enemyDiv);
+		neutralZone.setAttribute("class", "columns two");
+		this.myDiv.setAttribute("class", "columns five");
+		this.enemyDiv.setAttribute("class", "columns five");
 		this.messageBoard.innerHTML = message;
+		this.messageBoard.setAttribute("class", "message");
 		this.restart.innerHTML = "restart";
 		this.restart.addEventListener("click", this.restartGame);
 		this.restart.self = this;
