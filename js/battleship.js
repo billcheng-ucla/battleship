@@ -6,6 +6,7 @@ var Battleship = function(length, name)
 	this.name = name;
 	this.length = length;
 	this.space = [];
+	this.HP = length;
 }
 
 var Player = function(human) // prob dead code
@@ -15,6 +16,7 @@ var Player = function(human) // prob dead code
 
 var Board = function(location, owner="mine")
 {
+	var shipTypes = {"2": 'Patrol Boat', "3": "Cruiser", "4": "Battleship", "5": "Carrier"};
 	this.ships = [];
 	this.board = [];
 	this.waters = {}; // map of where everything is
@@ -46,7 +48,7 @@ var Board = function(location, owner="mine")
   		location.appendChild(mySeas);
 	}
 
-	this.deployShip = function(size)
+	this.deployShip = function(size, type)
 	{
 		var undeployed = true;
 		while (undeployed)
@@ -57,15 +59,18 @@ var Board = function(location, owner="mine")
 			var legal = this.checkLegality(x, y, size, orientation);
 			if (legal)
 			{
+				this.ships.push(new Battleship(size, type));
 				for(var i = 0; i < size; i++)
 				{
 					if(orientation > 5) // vertical
 					{
 						this.board[y + i][x] = 1;
+						this.ships[this.ships.length - 1].space.push(String(y + i) + String(x));
 					}
 					else // horizontal
 					{
 						this.board[y][x + i] = 1;
+						this.ships[this.ships.length - 1].space.push(String(y) + String(x + i));
 					}
 				}
 				undeployed = false;
@@ -132,9 +137,9 @@ var Board = function(location, owner="mine")
 	{
 		for(var i = 2; i < 6; i++)
 		{
-			this.deployShip(i);
+			this.deployShip(i, shipTypes[String(i)]);
 		}
-		this.deployShip(3);
+		this.deployShip(3, "destroyer");
 		this.updateSea();
 	}
 }
@@ -174,6 +179,7 @@ var Game = function()
 	}
 	this.newGame = function()
 	{
+		this.ships = [];
 		this.mySeas.spreadSeas();
   		this.mySeas.deployShips();
   		this.enemySea.spreadSeas();
@@ -188,11 +194,13 @@ var Game = function()
 		if(search === 0)
 		{
 			myself.enemySea.board[attackCoordinate[0]][attackCoordinate[1]]--;
+			myself.messageBoard.innerHTML = "Miss<br>";
 		}
 		else // if search === 1
 		{
 			myself.enemySea.HP--;
 			myself.enemySea.board[attackCoordinate[0]][attackCoordinate[1]]++;
+			myself.messageBoard.innerHTML = "Hit<br>";
 		}
 		e.target.removeEventListener("click", myself.playerAttack);
 		myself.enemySea.updateWater(attackCoordinate);
@@ -249,6 +257,8 @@ var Game = function()
 	}
 	this.gameBegin = function()
 	{
+		this.mySeas.HP = 17;
+		this.enemySea.HP = 17;
 		for(var i = 0; i < 10; i++)
 		{
 			for(var j = 0; j < 10; j++)
