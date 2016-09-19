@@ -1,13 +1,13 @@
 var message = "Greetings! <br> <br> Click on a grid to search that tile for an opponent's ship. If the opponent's ship is there, the tile will turn red; the tile will turn light blue if not. After you attack, your opponent will randomly try to attack your ships. Both you and your opponent start with a carrier(size 5), a battleship(size 4), a carrier and destroyer(size 3 each), and a patrol boat (size 2). Your ships have been randomly set for you (Neopet Rules) and they will appear green until hit. The winner is the first to sink his opponent's ships. Good Luck! <br><br>"
 
 // classes
-var Battleship = function(length, orientation = "horizontal")
+var Battleship = function(length, orientation = "horizontal") // will be used for my next update
 {
 	this.orientation = orientation;
 	this.length = length;
 }
 
-var Player = function(human)
+var Player = function(human) // prob dead code
 {
 	this.human = human;
 }
@@ -15,9 +15,9 @@ var Player = function(human)
 var Board = function(location, owner="mine")
 {
 	this.board = [];
-	this.waters = {};
+	this.waters = {}; // map of where everything is
 	this.HP = 17;
-	this.spreadSeas = function()
+	this.spreadSeas = function() // display map of blue squares
 	{
   		var mySeas = document.createElement("table");
   		for(var i = 0; i < 10; i++)
@@ -29,7 +29,7 @@ var Board = function(location, owner="mine")
   				var coordinate = String(i) + String(j);
   				myWater = document.createElement("td");
   				myWater.setAttribute("class", owner);
-  				myWater.setAttribute("coordinate", coordinate);
+  				myWater.setAttribute("coordinate", coordinate); // breaking the spirit of the law of no 'id' but not the letter :-)
   				this.board[i][j] = 0;
   				this.waters[coordinate] = myWater;
   				seaLine.appendChild(myWater);
@@ -37,7 +37,7 @@ var Board = function(location, owner="mine")
   			mySeas.appendChild(seaLine);
   		}
   		//console.log(location.childNodes);
-  		if(location.childNodes[0])
+  		if(location.childNodes[0]) // removeChild will crash of the returned object does not exist
   		{
   			location.removeChild(location.childNodes[0]);
   		}
@@ -110,7 +110,7 @@ var Board = function(location, owner="mine")
 		}
 		else
 		{
-			this.waters[coordinate].style.backgroundColor = "";
+			this.waters[coordinate].style.backgroundColor = ""; // and this will not
 		}
 		
 	}
