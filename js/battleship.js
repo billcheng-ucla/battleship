@@ -260,6 +260,8 @@ var Game = function()
 
 	this.gameEnd = function()
 	{
+		this.mySeas.HP = 17;
+		this.enemySea.HP = 17;
 		for(var i = 0; i < 10; i++)
 		{
 			for(var j = 0; j < 10; j++)
